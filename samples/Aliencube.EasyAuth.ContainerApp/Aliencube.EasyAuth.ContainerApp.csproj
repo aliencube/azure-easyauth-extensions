@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <AssemblyName>Aliencube.EasyAuth.ContainerApp</AssemblyName>
+    <RootNamespace>Aliencube.EasyAuth.ContainerApp</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Aliencube.Azure.Extensions.EasyAuth.EntraID\Aliencube.Azure.Extensions.EasyAuth.EntraID.csproj" />
+    <ProjectReference Include="..\Aliencube.EasyAuth.Components\Aliencube.EasyAuth.Components.csproj" />
+  </ItemGroup>
+
+</Project>

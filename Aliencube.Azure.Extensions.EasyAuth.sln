@@ -1,0 +1,57 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{06F594B0-609C-434B-9CBD-20918198BE18}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aliencube.Azure.Extensions.EasyAuth", "src\Aliencube.Azure.Extensions.EasyAuth\Aliencube.Azure.Extensions.EasyAuth.csproj", "{FBA74885-FC4D-4700-8933-FDA7A5F5F019}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aliencube.Azure.Extensions.EasyAuth.EntraID", "src\Aliencube.Azure.Extensions.EasyAuth.EntraID\Aliencube.Azure.Extensions.EasyAuth.EntraID.csproj", "{F457E9D5-4943-45FB-B75C-DA2069686817}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{FAE971D5-5E30-4BC5-B271-7AE8C56F809C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aliencube.EasyAuth.Components", "samples\Aliencube.EasyAuth.Components\Aliencube.EasyAuth.Components.csproj", "{9B093632-846A-444A-A5F3-706C82C4090B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aliencube.EasyAuth.WebApp", "samples\Aliencube.EasyAuth.WebApp\Aliencube.EasyAuth.WebApp.csproj", "{63DA4086-D30C-4B81-8FC4-3B370C871476}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aliencube.EasyAuth.ContainerApp", "samples\Aliencube.EasyAuth.ContainerApp\Aliencube.EasyAuth.ContainerApp.csproj", "{F6050C24-5E15-4363-B26D-51EAD1F0504D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FBA74885-FC4D-4700-8933-FDA7A5F5F019}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FBA74885-FC4D-4700-8933-FDA7A5F5F019}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FBA74885-FC4D-4700-8933-FDA7A5F5F019}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FBA74885-FC4D-4700-8933-FDA7A5F5F019}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F457E9D5-4943-45FB-B75C-DA2069686817}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F457E9D5-4943-45FB-B75C-DA2069686817}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F457E9D5-4943-45FB-B75C-DA2069686817}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F457E9D5-4943-45FB-B75C-DA2069686817}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B093632-846A-444A-A5F3-706C82C4090B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B093632-846A-444A-A5F3-706C82C4090B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B093632-846A-444A-A5F3-706C82C4090B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B093632-846A-444A-A5F3-706C82C4090B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{63DA4086-D30C-4B81-8FC4-3B370C871476}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{63DA4086-D30C-4B81-8FC4-3B370C871476}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{63DA4086-D30C-4B81-8FC4-3B370C871476}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{63DA4086-D30C-4B81-8FC4-3B370C871476}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F6050C24-5E15-4363-B26D-51EAD1F0504D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F6050C24-5E15-4363-B26D-51EAD1F0504D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F6050C24-5E15-4363-B26D-51EAD1F0504D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F6050C24-5E15-4363-B26D-51EAD1F0504D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FBA74885-FC4D-4700-8933-FDA7A5F5F019} = {06F594B0-609C-434B-9CBD-20918198BE18}
+		{F457E9D5-4943-45FB-B75C-DA2069686817} = {06F594B0-609C-434B-9CBD-20918198BE18}
+		{9B093632-846A-444A-A5F3-706C82C4090B} = {FAE971D5-5E30-4BC5-B271-7AE8C56F809C}
+		{63DA4086-D30C-4B81-8FC4-3B370C871476} = {FAE971D5-5E30-4BC5-B271-7AE8C56F809C}
+		{F6050C24-5E15-4363-B26D-51EAD1F0504D} = {FAE971D5-5E30-4BC5-B271-7AE8C56F809C}
+	EndGlobalSection
+EndGlobal

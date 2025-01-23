@@ -1,0 +1,37 @@
+﻿@using System.Text.Json
+@using Aliencube.EasyAuth.Components.Services
+@inject IRequestService Service
+
+<h2>Auth Details</h2>
+
+@if (string.IsNullOrWhiteSpace(headers) == false)
+{
+    <h3>Headers</h3>
+    <pre class="text-break">@headers</pre>
+}
+
+@if (string.IsNullOrWhiteSpace(authMe) == false)
+{
+    <h3><code>/.auth/me</code></h3>
+    <pre class="text-break">@authMe</pre>
+}
+
+@if (string.IsNullOrWhiteSpace(clientPrincipal) == false)
+{
+    <h3><code>HEADER: X-MS-CLIENT-PRINCIPAL</code></h3>
+    <pre class="text-break">@clientPrincipal</pre>
+}
+
+@code
+{
+    private string? headers;
+    private string? authMe;
+    private string? clientPrincipal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.headers = await this.Service.GetHeaders();
+        this.authMe = await this.Service.GetAuthMe();
+        this.clientPrincipal = await this.Service.GetClientPrincipal();
+    }
+}
