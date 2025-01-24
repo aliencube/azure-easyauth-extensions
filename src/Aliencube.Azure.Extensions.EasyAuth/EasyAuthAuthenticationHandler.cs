@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Text.Encodings.Web;
 
 using Microsoft.AspNetCore.Authentication;
@@ -21,13 +22,13 @@ public class EasyAuthAuthenticationHandler(IOptionsMonitor<EasyAuthAuthenticatio
         try
         {
             var easyAuthProvider = this.GetEasyAuthProvider();
-            var encoded = Context.Request.Headers["X-MS-CLIENT-PRINCIPAL"].FirstOrDefault();
+            var encoded = this.GetClientPrincipal();
             if (string.IsNullOrWhiteSpace(encoded) == true)
             {
                 return AuthenticateResult.NoResult();
             }
 
-            var principal = await MsClientPrincipal.ParseClaimsPrincipal(encoded!).ConfigureAwait(false);
+            var principal = await this.GetClaimsPrincipal(encoded).ConfigureAwait(false);
             if (principal == null)
             {
                 return AuthenticateResult.NoResult();
@@ -53,5 +54,24 @@ public class EasyAuthAuthenticationHandler(IOptionsMonitor<EasyAuthAuthenticatio
     protected virtual string GetEasyAuthProvider()
     {
         return Context.Request.Headers["X-MS-CLIENT-PRINCIPAL-IDP"].FirstOrDefault() ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Gets the client principal from the request header.
+    /// </summary>
+    /// <returns>Returns the client principal.</returns>
+    protected virtual string? GetClientPrincipal()
+    {
+        return default;
+    }
+
+    /// <summary>
+    /// Gets the <see cref="ClaimsPrincipal"/> instance from the given value.
+    /// </summary>
+    /// <param name="encoded">The encoded client principal value.</param>
+    /// <returns>Returns <see cref="ClaimsPrincipal"/> instance.</returns>
+    protected virtual async Task<ClaimsPrincipal?> GetClaimsPrincipal(string encoded)
+    {
+        return await Task.FromResult<ClaimsPrincipal?>(default).ConfigureAwait(false);
     }
 }

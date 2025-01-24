@@ -1,4 +1,5 @@
-﻿using System.Text.Encodings.Web;
+﻿using System.Security.Claims;
+using System.Text.Encodings.Web;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,5 +22,21 @@ public class EntraIDEasyAuthAuthenticationHandler(IOptionsMonitor<EasyAuthAuthen
     protected override string GetEasyAuthProvider()
     {
         return Context.Request.Headers["X-MS-CLIENT-PRINCIPAL-IDP"].FirstOrDefault() ?? "aad";
+    }
+
+    /// <inheritdoc />
+    protected override string? GetClientPrincipal()
+    {
+        var encoded = Context.Request.Headers["X-MS-CLIENT-PRINCIPAL"].FirstOrDefault();
+
+        return encoded;
+    }
+
+    /// <inheritdoc />
+    protected override async Task<ClaimsPrincipal?> GetClaimsPrincipal(string encoded)
+    {
+        var principal = await MsClientPrincipal.ParseClaimsPrincipal(encoded).ConfigureAwait(false);
+
+        return principal;
     }
 }

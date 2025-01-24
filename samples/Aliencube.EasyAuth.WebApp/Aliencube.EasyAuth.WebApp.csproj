@@ -1,8 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <AssemblyName>Aliencube.EasyAuth.WebApp</AssemblyName>
     <RootNamespace>Aliencube.EasyAuth.WebApp</RootNamespace>
+
+    <UserSecretsId>c2b5c632-9872-4b77-a0d9-b4709075801c</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
