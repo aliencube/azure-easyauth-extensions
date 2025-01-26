@@ -1,0 +1,115 @@
+name: Publish to NuGet
+
+on:
+  push:
+    branches:
+    - main
+    tags:
+    - 'v*'
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  build:
+    name: Build Library
+
+    strategy:
+      matrix:
+        os: [ 'windows-latest', 'ubuntu-latest', 'macos-latest' ]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: |
+          8.x
+          9.x
+
+    - name: Check package version
+      id: version
+      shell: pwsh
+      run: |
+        $version = $env:GITHUB_REF -replace 'refs/tags/v', ''
+        if ($($env:GITHUB_REF).StartsWith('refs/tags/v') -eq $false) {
+          $version = "1.0.0"
+        }
+
+        "value=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+    - name: Restore NuGet packages
+      shell: bash
+      run: |
+        dotnet restore
+
+    - name: Build solution
+      shell: bash
+      run: |
+        dotnet build -c Release -p:Version=${{ steps.version.outputs.value }}
+
+    - name: Test solution
+      shell: bash
+      run: |
+        dotnet test -c Release
+
+    - name: Pack NuGet package
+      if: ${{ startsWith(github.ref, 'refs/tags/v') && matrix.os == 'ubuntu-latest' }}
+      shell: bash
+      run: |
+        dotnet pack ./src/Aliencube.Azure.Extensions.EasyAuth -c Release -o published --include-symbols -p:Version=${{ steps.version.outputs.value }}
+        dotnet pack ./src/Aliencube.Azure.Extensions.EasyAuth.EntraID -c Release -o published --include-symbols -p:Version=${{ steps.version.outputs.value }}
+
+    - name: Upload Artifact
+      if: ${{ startsWith(github.ref, 'refs/tags/v') && matrix.os == 'ubuntu-latest' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: artifacts
+        path: ./published/
+
+  release:
+    name: Release Library
+    if: ${{ startsWith(github.ref, 'refs/tags/v') }}
+    needs:
+    - build
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      packages: write
+      contents: write
+
+    steps:
+    - name: Check package version
+      id: version
+      shell: pwsh
+      run: |
+        $version = $env:GITHUB_REF -replace 'refs/tags/v', ''
+        if ($($env:GITHUB_REF).StartsWith('refs/tags/v') -eq $false) {
+          $version = "v1.0.0"
+        }
+
+        "value=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+    - name: Download Artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: artifacts
+        path: ./published
+
+    - name: Create Release to GitHub
+      uses: softprops/action-gh-release@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag_name: "v${{ steps.version.outputs.value }}"
+        files: ./published/*.*
+        generate_release_notes: true
+
+    - name: Release to NuGet
+      shell: bash
+      run: |
+        dotnet nuget push ./published/*.nupkg --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }}
