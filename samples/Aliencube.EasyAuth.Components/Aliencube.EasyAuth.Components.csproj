@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <AssemblyName>Aliencube.EasyAuth.Components</AssemblyName>
+    <RootNamespace>Aliencube.EasyAuth.Components</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="$(AspNetCoreVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Aliencube.Azure.Extensions.EasyAuth\Aliencube.Azure.Extensions.EasyAuth.csproj" />
+  </ItemGroup>
+
+</Project>

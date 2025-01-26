@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Aliencube.Azure.Extensions.EasyAuth.EntraID</AssemblyName>
+    <RootNamespace>Aliencube.Azure.Extensions.EasyAuth.EntraID</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Aliencube.Azure.Extensions.EasyAuth\Aliencube.Azure.Extensions.EasyAuth.csproj" />
+  </ItemGroup>
+
+</Project>
