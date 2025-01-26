@@ -1,9 +1,58 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+
     <AssemblyName>Aliencube.Azure.Extensions.EasyAuth.EntraID</AssemblyName>
     <RootNamespace>Aliencube.Azure.Extensions.EasyAuth.EntraID</RootNamespace>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+
+    <PackageId>Aliencube.Azure.Extensions.EasyAuth.EntraID</PackageId>
+    <Version>1.0.0</Version>
+
+    <Title>Aliencube.Azure.Extensions.EasyAuth.EntraID</Title>
+    <Authors>Justin Yoo</Authors>
+    <Company>Aliencube Community</Company>
+    <Product>Aliencube.Azure.Extensions.EasyAuth.EntraID</Product>
+    <Summary>Azure EasyAuth token conversion library</Summary>
+    <Description>This is a library that converts Azure EasyAuth client principal into ASP.NET claims principal</Description>
+    <Copyright>© Aliencube Community. All rights reserved.</Copyright>
+    <Owners>justinyoo</Owners>
+
+    <PackageProjectUrl>https://github.com/aliencube/azure-easyauth-extensions</PackageProjectUrl>
+    <PackageIcon>Aliencube.Azure.Extensions.EasyAuth.png</PackageIcon>
+    <PackageIconUrl>https://raw.githubusercontent.com/aliencube/azure-easyauth-extensions/main/assets/Aliencube.Azure.Extensions.EasyAuth.png</PackageIconUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageTags>azure;easyauth</PackageTags>
+
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+
+    <RepositoryUrl>https://github.com/aliencube/azure-easyauth-extensions</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <IncludeSymbols>True</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+    <None Include="..\..\assets\Aliencube.Azure.Extensions.EasyAuth.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Aliencube.Azure.Extensions.EasyAuth\Aliencube.Azure.Extensions.EasyAuth.csproj" />

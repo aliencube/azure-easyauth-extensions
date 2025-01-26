@@ -16,7 +16,7 @@ param openIdIssuer string
 param unauthenticatedClientAction string = 'RedirectToLoginPage'
 
 
-resource containerapp 'Microsoft.App/containerApps@2024-10-02-preview' existing = {
+resource containerApp 'Microsoft.App/containerApps@2024-10-02-preview' existing = {
   name: containerAppName
 }
 
@@ -28,9 +28,9 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-05-01' existing 
   name: storageAccountName
 }
 
-resource containerappAuthConfig 'Microsoft.App/containerApps/authConfigs@2024-10-02-preview' = {
+resource containerAppAuthConfig 'Microsoft.App/containerApps/authConfigs@2024-10-02-preview' = {
   name: 'current'
-  parent: containerapp
+  parent: containerApp
   properties: {
     platform: {
       enabled: true

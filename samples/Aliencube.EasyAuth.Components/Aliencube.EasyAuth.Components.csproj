@@ -1,6 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+
     <AssemblyName>Aliencube.EasyAuth.Components</AssemblyName>
     <RootNamespace>Aliencube.EasyAuth.Components</RootNamespace>
   </PropertyGroup>
