@@ -17,9 +17,9 @@ resource appService 'Microsoft.Web/sites@2022-03-01' existing = {
   name: appServiceName
 }
 
-resource configAuth 'Microsoft.Web/sites/config@2022-03-01' = {
-  parent: appService
+resource appServiceAuthConfig 'Microsoft.Web/sites/config@2022-03-01' = {
   name: 'authsettingsV2'
+  parent: appService
   properties: {
     globalValidation: {
       requireAuthentication: true

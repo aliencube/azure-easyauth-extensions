@@ -101,7 +101,85 @@ By focusing on two services &ndash; Azure App Service and Azure Container Apps, 
 
 [Blazor](https://learn.microsoft.com/aspnet/core/blazor/) is used for explanation, but you can apply it to your ASP.NET Core web app as well.
 
-TBD
+1. Add a NuGet package to your Blazor web app project. You can add one or more NuGet package libraries depending on your requirements.
+
+    ```bash
+    # For Entra ID
+    dotnet add package Aliencube.Azure.Extensions.EasyAuth.EntraID
+    ```
+
+1. Open `Program.cs` of your Blazor app, find the line, `var app = builder.Build();`, and add the following lines just above the line:
+
+    ```csharp
+    // 👇👇👇 Add EasyAuth handler with Entra ID below.
+    builder.Services.AddAuthentication(EasyAuthAuthenticationScheme.Name)
+                    .AddAzureEasyAuthHandler<EntraIDEasyAuthAuthenticationHandler>();
+    builder.Services.AddAuthorization();
+    // 👆👆👆 Add EasyAuth handler with Entra ID above.
+    
+    var app = builder.Build();
+    ```
+
+1. In the same `Program.cs` of your Blazor app, find the line, `app.Run();`, and add the following lines just above the line:
+
+    ```csharp
+    // 👇👇👇 Add authentication/authorization below.
+    app.UseAuthentication();
+    app.UseAuthorization();
+    // 👆👆👆 Add authentication/authorization above.
+    
+    app.Run();
+    ```
+
+1. Open any Razor page component and add the following lines:
+
+    ```razor
+    @page "/random-page-url"
+    
+    @* 👇👇👇 Add the lines below *@
+    @using Aliencube.Azure.Extensions.EasyAuth
+    @using Microsoft.AspNetCore.Authorization
+    @attribute [Authorize(AuthenticationSchemes = EasyAuthAuthenticationScheme.Name)]
+    @* 👆👆👆 Add the lines above *@
+    ```
+
+1. Use Azure Portal, and make sure that you have enabled the EasyAuth feature and allow unauthenticated access.
+
+   ![EasyAuth on Azure Container Apps](./assets/easyauth-aca.png)
+   ![EasyAuth on Azure App Service](./assets/easyauth-appsvc.png)
+
+1. Alternatively, use Bicep to enable the EasyAuth feature and allow unauthenticated access.
+
+    ```bicep
+    // For Azure Container Apps
+    resource containerappAuthConfig 'Microsoft.App/containerApps/authConfigs@2024-10-02-preview' = {
+      name: 'current'
+      parent: containerapp
+      properties: {
+        globalValidation: {
+          requireAuthentication: true
+          unauthenticatedClientAction: 'AllowAnonymous'
+        }
+      }
+    }
+    ```
+
+    ```bicep
+    // For Azure App Service
+    resource appServiceAuthConfig 'Microsoft.Web/sites/config@2022-03-01' = {
+      name: 'authsettingsV2'
+      parent: appService
+      properties: {
+        globalValidation: {
+          requireAuthentication: true
+          unauthenticatedClientAction: 'AllowAnonymous'
+        }
+      }
+    }
+    ```
+
+1. Deploy the app to either Azure App Service or Azure Container Apps, navigate to the page that you enabled authorization and see the `401 Unauthorized` error.
+1. Sign-in the web app, navigate to the page again and see no error.
 
 ## Out-of-Scope
 
@@ -111,7 +189,7 @@ This repository currently doesn't support:
 
 ## TO-DO List
 
-- [ ] Publish NuGet packages
+- [x] Publish NuGet packages
 - [x] Implementation for Entra ID
 - [ ] Implementation for GitHub
 - [ ] Implementation for OpenID Connect
