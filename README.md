@@ -1,5 +1,10 @@
 # Azure EasyAuth Extensions
 
+| Package                                                                                                                   | Version | Downloads |
+| ------------------------------------------------------------------------------------------------------------------------- | ------- | --------- |
+| [Aliencube.Azure.Extensions.EasyAuth](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth)                 | [![NuGet Version](https://img.shields.io/nuget/v/Aliencube.Azure.Extensions.EasyAuth?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth) | [![NuGet Downloads](https://img.shields.io/nuget/dt/Aliencube.Azure.Extensions.EasyAuth?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth) |
+| [Aliencube.Azure.Extensions.EasyAuth.EntraID](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth.EntraID) | [![NuGet Version](https://img.shields.io/nuget/v/Aliencube.Azure.Extensions.EasyAuth.EntraID?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth.EntraID) | [![NuGet Downloads](https://img.shields.io/nuget/dt/Aliencube.Azure.Extensions.EasyAuth.EntraID?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth.EntraID) |
+
 Azure services like [Azure App Service](https://learn.microsoft.com/azure/app-service/overview), [Azure Functions](https://learn.microsoft.com/azure/azure-functions/functions-overview), [Azure Container Apps](https://learn.microsoft.com/azure/container-apps/overview) and [Azure Static Web Apps](https://learn.microsoft.com/azure/static-web-apps/overview) offer a built-in authentication service called EasyAuth.
 
 While EasyAuth significantly reduces the time for implementing authentication, because it protects the entire application, you can't protect only specific pages or components.
