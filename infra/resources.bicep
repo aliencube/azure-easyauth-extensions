@@ -9,16 +9,23 @@ param location string = resourceGroup().location
 @description('Tags that will be applied to all resources')
 param tags object = {}
 
-
 param containerAppExists bool
 @secure()
 param containerAppDefinition object
+
+@description('The client ID of the GitHub application.')
+param gitHubClientId string
+@description('The client secret of the GitHub application.')
+@secure()
+param gitHubClientSecret string
 
 @description('Id of the user or app to assign application roles')
 param principalId string
 
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = uniqueString(subscription().id, resourceGroup().id, location)
+
+var gitHubIdentityProviderExists = gitHubClientId != '' && gitHubClientSecret != ''
 
 // Monitor application with Azure Monitor
 module monitoring 'br/public:avm/ptn/azd/monitoring:0.1.0' = {
@@ -138,6 +145,12 @@ module containerApp 'br/public:avm/res/app/container-app:0.11.0' = {
     secrets: {
       secureList: union([
       ],
+      gitHubIdentityProviderExists == true ? [
+        {
+          name: 'github-provider-authentication-secret'
+          value: gitHubClientSecret
+        }
+      ] : [],
       map(containerAppSecrets, secret => {
         name: secret.secretRef
         value: secret.value
@@ -228,12 +241,27 @@ module webApp 'br/public:avm/res/web/site:0.12.1' = {
       ]
     }
     siteConfig: {
-      appSettings: [
-        {
-          name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
-          value: 'false'
-        }
-      ]
+      appSettings: union(
+        gitHubIdentityProviderExists == true ? [
+          {
+            name: 'GITHUB_PROVIDER_AUTHENTICATION_SECRET'
+            value: gitHubClientSecret
+          }
+        ] : [],
+        [
+          {
+            name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+            value: monitoring.outputs.applicationInsightsInstrumentationKey
+          }
+          {
+            name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+            value: monitoring.outputs.applicationInsightsConnectionString
+          }
+          {
+            name: 'WEBSITES_ENABLE_APP_SERVICE_STORAGE'
+            value: 'false'
+          }
+        ])
       ftpsState: 'FtpsOnly'
       linuxFxVersion: 'DOTNETCORE|9.0'
       alwaysOn: true
@@ -275,7 +303,8 @@ module containerAppAuthConfig './modules/containerapps-authconfigs.bicep' = {
     containerAppName: containerApp.outputs.name
     managedIdentityName: containerAppIdentity.outputs.name
     storageAccountName: storageAccount.outputs.name
-    clientId: appRegistration.outputs.appId
+    entraClientId: appRegistration.outputs.appId
+    gitHubClientId: gitHubClientId
     openIdIssuer: issuer
     unauthenticatedClientAction: 'AllowAnonymous'
   }
@@ -286,7 +315,8 @@ module webAppAuthConfig './modules/appservice-authconfigs.bicep' = {
   name: 'web-app-auth-config'
   params: {
     appServiceName: webApp.outputs.name
-    clientId: appRegistration.outputs.appId
+    entraClientId: appRegistration.outputs.appId
+    gitHubClientId: gitHubClientId
     openIdIssuer: issuer
     unauthenticatedClientAction: 'AllowAnonymous'
   }

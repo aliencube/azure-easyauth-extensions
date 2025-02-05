@@ -13,6 +13,12 @@ param containerAppExists bool
 @secure()
 param containerAppDefinition object
 
+@description('The client ID of the GitHub application.')
+param gitHubClientId string
+@description('The client secret of the GitHub application.')
+@secure()
+param gitHubClientSecret string
+
 @description('Id of the user or app to assign application roles')
 param principalId string
 
@@ -39,6 +45,8 @@ module resources 'resources.bicep' = {
     environmentName: environmentName
     location: location
     tags: tags
+    gitHubClientId: gitHubClientId
+    gitHubClientSecret: gitHubClientSecret
     principalId: principalId
     containerAppExists: containerAppExists
     containerAppDefinition: containerAppDefinition

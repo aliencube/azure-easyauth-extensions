@@ -1,7 +1,9 @@
 param appServiceName string
 
 @description('The client ID of the Microsoft Entra application.')
-param clientId string
+param entraClientId string
+@description('The client ID of the GitHub application.')
+param gitHubClientId string
 
 param openIdIssuer string
 
@@ -30,17 +32,24 @@ resource appServiceAuthConfig 'Microsoft.Web/sites/config@2022-03-01' = {
       azureActiveDirectory: {
         enabled: true
         registration: {
-          clientId: clientId
+          clientId: entraClientId
           openIdIssuer: openIdIssuer
         }
         validation: {
           defaultAuthorizationPolicy: {
             allowedApplications: [
-              clientId
+              entraClientId
             ]
           }
         }
       }
+      gitHub: gitHubClientId != '' ? {
+        enabled: true
+        registration: {
+          clientId: gitHubClientId
+          clientSecretSettingName: 'GITHUB_PROVIDER_AUTHENTICATION_SECRET'
+        }
+      } : null
     }
     login: {
       tokenStore: {
