@@ -22,10 +22,14 @@ builder.Services.AddHttpClient<IRequestService, RequestService>((sp, client) =>
     client.BaseAddress = new Uri(baseUrl);
 });
 
+// To use EasyAuth with EntraID, uncomment the following line
 builder.Services.AddAuthentication(EasyAuthAuthenticationScheme.Name)
                 .AddAzureEasyAuthHandler<EntraIDEasyAuthAuthenticationHandler>();
+
+// To use EasyAuth with GitHub, uncomment the following line
 // builder.Services.AddAuthentication(EasyAuthAuthenticationScheme.Name)
 //                 .AddAzureEasyAuthHandler<GitHubEasyAuthAuthenticationHandler>();
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

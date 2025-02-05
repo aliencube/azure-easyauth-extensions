@@ -9,7 +9,10 @@
         <div class="top-row px-4">
             @if (isAuthenticated == false)
             {
+                @* To use EasyAuth with EntraID, uncomment the following line *@
                 <a href="/.auth/login/aad?post_login_redirect_uri=/">Login</a>
+
+                @* To use EasyAuth with GitHub, uncomment the following line *@
                 @* <a href="/.auth/login/github?post_login_redirect_uri=/">Login</a> *@
             }
             else
