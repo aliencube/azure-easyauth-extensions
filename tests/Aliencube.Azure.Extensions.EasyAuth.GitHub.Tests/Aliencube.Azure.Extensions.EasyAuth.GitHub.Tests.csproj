@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+
+    <IsPackable>false</IsPackable>
+
+    <AssemblyName>Aliencube.Azure.Extensions.EasyAuth.GitHub.Tests</AssemblyName>
+    <RootNamespace>Aliencube.Azure.Extensions.EasyAuth.GitHub.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.*" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.*" />
+    <PackageReference Include="Shouldly" Version="4.*" />
+    <PackageReference Include="xunit" Version="2.*" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Aliencube.Azure.Extensions.EasyAuth.GitHub\Aliencube.Azure.Extensions.EasyAuth.GitHub.csproj" />
+    <ProjectReference Include="..\Aliencube.Azure.Extensions.EasyAuth.Tests\Aliencube.Azure.Extensions.EasyAuth.Tests.csproj" />
+  </ItemGroup>
+
+</Project>
