@@ -1,5 +1,6 @@
 using Aliencube.Azure.Extensions.EasyAuth;
 using Aliencube.Azure.Extensions.EasyAuth.EntraID;
+using Aliencube.Azure.Extensions.EasyAuth.GitHub;
 using Aliencube.EasyAuth.Components.Services;
 using Aliencube.EasyAuth.ContainerApp.Components;
 
@@ -23,6 +24,8 @@ builder.Services.AddHttpClient<IRequestService, RequestService>((sp, client) =>
 
 builder.Services.AddAuthentication(EasyAuthAuthenticationScheme.Name)
                 .AddAzureEasyAuthHandler<EntraIDEasyAuthAuthenticationHandler>();
+// builder.Services.AddAuthentication(EasyAuthAuthenticationScheme.Name)
+//                 .AddAzureEasyAuthHandler<GitHubEasyAuthAuthenticationHandler>();
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

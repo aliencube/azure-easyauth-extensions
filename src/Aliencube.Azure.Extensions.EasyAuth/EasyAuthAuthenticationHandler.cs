@@ -37,7 +37,7 @@ public class EasyAuthAuthenticationHandler(IOptionsMonitor<EasyAuthAuthenticatio
             }
 
             var principal = await this.GetClaimsPrincipal(encoded).ConfigureAwait(false);
-            if (principal == null)
+            if (principal == default)
             {
                 return AuthenticateResult.NoResult();
             }
@@ -86,10 +86,22 @@ public class EasyAuthAuthenticationHandler(IOptionsMonitor<EasyAuthAuthenticatio
     /// <summary>
     /// Gets the <see cref="ClaimsPrincipal"/> instance from the given value.
     /// </summary>
-    /// <param name="encoded">The encoded client principal value.</param>
+    /// <param name="clientPrincipal"><see cref="MsClientPrincipal"/> instance.</param>
     /// <returns>Returns <see cref="ClaimsPrincipal"/> instance.</returns>
-    protected virtual async Task<ClaimsPrincipal?> GetClaimsPrincipal(string? encoded)
+    protected virtual async Task<ClaimsPrincipal?> GetClaimsPrincipal(MsClientPrincipal? clientPrincipal)
     {
         return await Task.FromResult<ClaimsPrincipal?>(default).ConfigureAwait(false);
+    }
+
+    private async Task<ClaimsPrincipal?> GetClaimsPrincipal(string? encoded)
+    {
+        if (string.IsNullOrWhiteSpace(encoded) == true)
+        {
+            return default;
+        }
+
+        var clientPrincipal = await MsClientPrincipal.ParseMsClientPrincipal(encoded!).ConfigureAwait(false);
+
+        return await this.GetClaimsPrincipal(clientPrincipal).ConfigureAwait(false);
     }
 }
