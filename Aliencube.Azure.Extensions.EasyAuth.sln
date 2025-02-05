@@ -19,6 +19,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aliencube.EasyAuth.WebApp",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aliencube.EasyAuth.ContainerApp", "samples\Aliencube.EasyAuth.ContainerApp\Aliencube.EasyAuth.ContainerApp.csproj", "{F6050C24-5E15-4363-B26D-51EAD1F0504D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{460FB4BE-9057-4FBB-AA9C-04BBC0E5DF31}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aliencube.Azure.Extensions.EasyAuth.Tests", "tests\Aliencube.Azure.Extensions.EasyAuth.Tests\Aliencube.Azure.Extensions.EasyAuth.Tests.csproj", "{56D84120-26C1-44DC-B556-C501B93DBB26}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aliencube.Azure.Extensions.EasyAuth.EntraID.Tests", "tests\Aliencube.Azure.Extensions.EasyAuth.EntraID.Tests\Aliencube.Azure.Extensions.EasyAuth.EntraID.Tests.csproj", "{9AF1C5B3-748D-4C2E-9CFF-F7513D9E4562}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aliencube.Azure.Extensions.EasyAuth.GitHub.Tests", "tests\Aliencube.Azure.Extensions.EasyAuth.GitHub.Tests\Aliencube.Azure.Extensions.EasyAuth.GitHub.Tests.csproj", "{51B5CAA5-1154-4365-B73D-EA6BD2BF9406}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -52,6 +60,18 @@ Global
 		{F6050C24-5E15-4363-B26D-51EAD1F0504D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F6050C24-5E15-4363-B26D-51EAD1F0504D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F6050C24-5E15-4363-B26D-51EAD1F0504D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56D84120-26C1-44DC-B556-C501B93DBB26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56D84120-26C1-44DC-B556-C501B93DBB26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56D84120-26C1-44DC-B556-C501B93DBB26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56D84120-26C1-44DC-B556-C501B93DBB26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9AF1C5B3-748D-4C2E-9CFF-F7513D9E4562}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9AF1C5B3-748D-4C2E-9CFF-F7513D9E4562}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9AF1C5B3-748D-4C2E-9CFF-F7513D9E4562}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9AF1C5B3-748D-4C2E-9CFF-F7513D9E4562}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51B5CAA5-1154-4365-B73D-EA6BD2BF9406}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51B5CAA5-1154-4365-B73D-EA6BD2BF9406}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51B5CAA5-1154-4365-B73D-EA6BD2BF9406}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51B5CAA5-1154-4365-B73D-EA6BD2BF9406}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{FBA74885-FC4D-4700-8933-FDA7A5F5F019} = {06F594B0-609C-434B-9CBD-20918198BE18}
@@ -60,5 +80,8 @@ Global
 		{9B093632-846A-444A-A5F3-706C82C4090B} = {FAE971D5-5E30-4BC5-B271-7AE8C56F809C}
 		{63DA4086-D30C-4B81-8FC4-3B370C871476} = {FAE971D5-5E30-4BC5-B271-7AE8C56F809C}
 		{F6050C24-5E15-4363-B26D-51EAD1F0504D} = {FAE971D5-5E30-4BC5-B271-7AE8C56F809C}
+		{56D84120-26C1-44DC-B556-C501B93DBB26} = {460FB4BE-9057-4FBB-AA9C-04BBC0E5DF31}
+		{9AF1C5B3-748D-4C2E-9CFF-F7513D9E4562} = {460FB4BE-9057-4FBB-AA9C-04BBC0E5DF31}
+		{51B5CAA5-1154-4365-B73D-EA6BD2BF9406} = {460FB4BE-9057-4FBB-AA9C-04BBC0E5DF31}
 	EndGlobalSection
 EndGlobal
