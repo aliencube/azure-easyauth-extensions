@@ -65,6 +65,7 @@ jobs:
       run: |
         dotnet pack ./src/Aliencube.Azure.Extensions.EasyAuth -c Release -o published --include-symbols -p:Version=${{ steps.version.outputs.value }}
         dotnet pack ./src/Aliencube.Azure.Extensions.EasyAuth.EntraID -c Release -o published --include-symbols -p:Version=${{ steps.version.outputs.value }}
+        dotnet pack ./src/Aliencube.Azure.Extensions.EasyAuth.GitHub -c Release -o published --include-symbols -p:Version=${{ steps.version.outputs.value }}
 
     - name: Upload Artifact
       if: ${{ startsWith(github.ref, 'refs/tags/v') && matrix.os == 'ubuntu-latest' }}
