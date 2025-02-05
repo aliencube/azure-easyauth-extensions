@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -46,30 +45,5 @@ public class MsClientPrincipal
         var principal = await JsonSerializer.DeserializeAsync<MsClientPrincipal>(stream, options).ConfigureAwait(false);
 
         return principal;
-    }
-
-    /// <summary>
-    /// Parses the client principal header value to <see cref="ClaimsPrincipal"/> instance.
-    /// </summary>
-    /// <param name="value">Client Principal header value.</param>
-    /// <returns>Returns <see cref="ClaimsPrincipal"/> instance.</returns>
-    public static async Task<ClaimsPrincipal?> ParseClaimsPrincipal(string value)
-    {
-        var clientPrincipal = await ParseMsClientPrincipal(value).ConfigureAwait(false);
-        if (clientPrincipal == null || clientPrincipal.Claims?.Any() == false)
-        {
-            return null;
-        }
-
-        var claims = clientPrincipal.Claims!.Select(claim => new Claim(claim.Type!, claim.Value!));
-
-        // remap "roles" claims from easy auth to the more standard ClaimTypes.Role: "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-        var easyAuthRoleClaims = claims.Where(claim => claim.Type == "roles");
-        var claimsAndRoles = claims.Concat(easyAuthRoleClaims.Select(role => new Claim(clientPrincipal.RoleClaimType!, role.Value)));
-
-        var identity = new ClaimsIdentity(claimsAndRoles, clientPrincipal.IdentityProvider, clientPrincipal.NameClaimType, clientPrincipal.RoleClaimType);
-        var claimsPrincipal = new ClaimsPrincipal(identity);
-
-        return claimsPrincipal;
     }
 }

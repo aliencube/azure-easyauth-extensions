@@ -2,8 +2,9 @@
 
 | Package                                                                                                                   | Version | Downloads |
 | ------------------------------------------------------------------------------------------------------------------------- | ------- | --------- |
-| [Aliencube.Azure.Extensions.EasyAuth](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth)                 | [![NuGet Version](https://img.shields.io/nuget/v/Aliencube.Azure.Extensions.EasyAuth?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth) | [![NuGet Downloads](https://img.shields.io/nuget/dt/Aliencube.Azure.Extensions.EasyAuth?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth) |
+| [Aliencube.Azure.Extensions.EasyAuth](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth)                 | [![NuGet Version](https://img.shields.io/nuget/v/Aliencube.Azure.Extensions.EasyAuth?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth)                 | [![NuGet Downloads](https://img.shields.io/nuget/dt/Aliencube.Azure.Extensions.EasyAuth?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth)                 |
 | [Aliencube.Azure.Extensions.EasyAuth.EntraID](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth.EntraID) | [![NuGet Version](https://img.shields.io/nuget/v/Aliencube.Azure.Extensions.EasyAuth.EntraID?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth.EntraID) | [![NuGet Downloads](https://img.shields.io/nuget/dt/Aliencube.Azure.Extensions.EasyAuth.EntraID?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth.EntraID) |
+| [Aliencube.Azure.Extensions.EasyAuth.GitHub](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth.GitHub)   | [![NuGet Version](https://img.shields.io/nuget/v/Aliencube.Azure.Extensions.EasyAuth.GitHub?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth.GitHub)   | [![NuGet Downloads](https://img.shields.io/nuget/dt/Aliencube.Azure.Extensions.EasyAuth.GitHub?logo=nuget)](https://www.nuget.org/packages/Aliencube.Azure.Extensions.EasyAuth.GitHub)   |
 
 Azure services like [Azure App Service](https://learn.microsoft.com/azure/app-service/overview), [Azure Functions](https://learn.microsoft.com/azure/azure-functions/functions-overview), [Azure Container Apps](https://learn.microsoft.com/azure/container-apps/overview) and [Azure Static Web Apps](https://learn.microsoft.com/azure/static-web-apps/overview) offer a built-in authentication service called EasyAuth.
 
@@ -48,7 +49,7 @@ By focusing on two services &ndash; Azure App Service and Azure Container Apps, 
     ```
 
 1. Login to Azure.
-    
+
     ```bash
     # Login to Azure via az CLI
     az login
@@ -65,7 +66,7 @@ By focusing on two services &ndash; Azure App Service and Azure Container Apps, 
     # az CLI
     az upgrade --allow-preview true
     ```
-    
+
     ```bash
     # az bicep CLI
     az bicep upgrade
@@ -106,11 +107,16 @@ By focusing on two services &ndash; Azure App Service and Azure Container Apps, 
 
 [Blazor](https://learn.microsoft.com/aspnet/core/blazor/) is used for explanation, but you can apply it to your ASP.NET Core web app as well.
 
-1. Add a NuGet package to your Blazor web app project. You can add one or more NuGet package libraries depending on your requirements.
+1. Add a NuGet package to your Blazor web app project.
 
     ```bash
-    # For Entra ID
+    # For EasyAuth with Entra ID
     dotnet add package Aliencube.Azure.Extensions.EasyAuth.EntraID
+    ```
+
+    ```bash
+    # For EasyAuth with GitHub
+    dotnet add package Aliencube.Azure.Extensions.EasyAuth.GitHub
     ```
 
 1. Open `Program.cs` of your Blazor app, find the line, `var app = builder.Build();`, and add the following lines just above the line:
@@ -121,6 +127,16 @@ By focusing on two services &ndash; Azure App Service and Azure Container Apps, 
                     .AddAzureEasyAuthHandler<EntraIDEasyAuthAuthenticationHandler>();
     builder.Services.AddAuthorization();
     // 👆👆👆 Add EasyAuth handler with Entra ID above.
+    
+    var app = builder.Build();
+    ```
+
+    ```csharp
+    // 👇👇👇 Add EasyAuth handler with GitHub below.
+    builder.Services.AddAuthentication(EasyAuthAuthenticationScheme.Name)
+                    .AddAzureEasyAuthHandler<GitHubEasyAuthAuthenticationHandler>();
+    builder.Services.AddAuthorization();
+    // 👆👆👆 Add EasyAuth handler with GitHub above.
     
     var app = builder.Build();
     ```
@@ -150,8 +166,8 @@ By focusing on two services &ndash; Azure App Service and Azure Container Apps, 
 
 1. Use Azure Portal, and make sure that you have enabled the EasyAuth feature and allow unauthenticated access.
 
-   ![EasyAuth on Azure Container Apps](./assets/easyauth-aca.png)
-   ![EasyAuth on Azure App Service](./assets/easyauth-appsvc.png)
+   ![EasyAuth on Azure Container Apps](https://github.com/aliencube/azure-easyauth-extensions/blob/main/assets/easyauth-aca.png?raw=true)
+   ![EasyAuth on Azure App Service](https://github.com/aliencube/azure-easyauth-extensions/blob/main/assets/easyauth-appsvc.png?raw=true)
 
 1. Alternatively, use Bicep to enable the EasyAuth feature and allow unauthenticated access.
 
@@ -196,9 +212,9 @@ This repository currently doesn't support:
 
 - [x] Publish NuGet packages
 - [x] Implementation for Entra ID
-- [ ] Implementation for GitHub
+- [x] Implementation for GitHub
 - [ ] Implementation for OpenID Connect
 - [ ] Implementation for Google
-- [ ] Implementation for Facebook
 - [ ] Implementation for X
+- [ ] Implementation for Facebook
 - [ ] Implementation for Apple

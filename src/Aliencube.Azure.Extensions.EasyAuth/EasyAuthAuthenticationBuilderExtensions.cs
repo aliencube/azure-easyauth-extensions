@@ -12,11 +12,11 @@ public static class EasyAuthAuthenticationBuilderExtensions
     /// </summary>
     /// <param name="builder"><see cref="AuthenticationBuilder"/> instance.</param>
     /// <param name="configure"><see cref="Action"/> delegate instance that takes the <see cref="EasyAuthAuthenticationOptions"/> instance.</param>
-    /// <returns></returns>
-    public static AuthenticationBuilder AddAzureEasyAuthHandler<THandler>(this AuthenticationBuilder builder, Action<EasyAuthAuthenticationOptions>? configure = null)
+    /// <returns>Returns <see cref="AuthenticationBuilder"/> instance.</returns>
+    public static AuthenticationBuilder AddAzureEasyAuthHandler<THandler>(this AuthenticationBuilder builder, Action<EasyAuthAuthenticationOptions>? configure = default)
         where THandler : AuthenticationHandler<EasyAuthAuthenticationOptions>
     {
-        if (configure == null)
+        if (configure == default)
         {
             configure = o => { };
         }

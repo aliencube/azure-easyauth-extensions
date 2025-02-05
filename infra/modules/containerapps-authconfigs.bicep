@@ -3,7 +3,9 @@ param managedIdentityName string
 param storageAccountName string
 
 @description('The client ID of the Microsoft Entra application.')
-param clientId string
+param entraClientId string
+@description('The client ID of the GitHub application.')
+param gitHubClientId string
 
 param openIdIssuer string
 
@@ -43,17 +45,24 @@ resource containerAppAuthConfig 'Microsoft.App/containerApps/authConfigs@2024-10
       azureActiveDirectory: {
         enabled: true
         registration: {
-          clientId: clientId
+          clientId: entraClientId
           openIdIssuer: openIdIssuer
         }
         validation: {
           defaultAuthorizationPolicy: {
             allowedApplications: [
-              clientId
+              entraClientId
             ]
           }
         }
       }
+      gitHub: gitHubClientId != '' ? {
+        enabled: true
+        registration: {
+          clientId: gitHubClientId
+          clientSecretSettingName: 'github-provider-authentication-secret'
+        }
+      } : null
     }
     login: {
       tokenStore: {

@@ -1,5 +1,6 @@
 using Aliencube.Azure.Extensions.EasyAuth;
 using Aliencube.Azure.Extensions.EasyAuth.EntraID;
+using Aliencube.Azure.Extensions.EasyAuth.GitHub;
 using Aliencube.EasyAuth.Components.Services;
 using Aliencube.EasyAuth.ContainerApp.Components;
 
@@ -21,8 +22,14 @@ builder.Services.AddHttpClient<IRequestService, RequestService>((sp, client) =>
     client.BaseAddress = new Uri(baseUrl);
 });
 
+// To use EasyAuth with EntraID, uncomment the following line
 builder.Services.AddAuthentication(EasyAuthAuthenticationScheme.Name)
                 .AddAzureEasyAuthHandler<EntraIDEasyAuthAuthenticationHandler>();
+
+// To use EasyAuth with GitHub, uncomment the following line
+// builder.Services.AddAuthentication(EasyAuthAuthenticationScheme.Name)
+//                 .AddAzureEasyAuthHandler<GitHubEasyAuthAuthenticationHandler>();
+
 builder.Services.AddAuthorization();
 
 var app = builder.Build();

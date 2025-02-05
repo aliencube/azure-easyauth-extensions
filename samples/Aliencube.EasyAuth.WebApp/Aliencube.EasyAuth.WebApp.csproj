@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Aliencube.Azure.Extensions.EasyAuth.EntraID\Aliencube.Azure.Extensions.EasyAuth.EntraID.csproj" />
+    <ProjectReference Include="..\..\src\Aliencube.Azure.Extensions.EasyAuth.GitHub\Aliencube.Azure.Extensions.EasyAuth.GitHub.csproj" />
     <ProjectReference Include="..\Aliencube.EasyAuth.Components\Aliencube.EasyAuth.Components.csproj" />
   </ItemGroup>
 
