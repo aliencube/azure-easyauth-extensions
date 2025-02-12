@@ -3,6 +3,8 @@ using System.Text.Json;
 
 using Aliencube.Azure.Extensions.EasyAuth.Emulator.Models;
 
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+
 namespace Aliencube.Azure.Extensions.EasyAuth.Emulator.Services;
 
 public interface IEasyAuthService
@@ -11,36 +13,76 @@ public interface IEasyAuthService
 
     Guid UserId { get; }
 
+    Guid ClientId { get; }
+
+    Guid TenantId { get; }
+
     IEnumerable<string> UserRoles { get; }
 
-    Task<IEnumerable<MsClientPrincipalClaim>> GetUserClaims(string? identityProvider);
+    IdentityProviderType GetIdentityProvider(string? identityProvider);
 
-    Task<bool> UserSignInAsync(HttpContext? context, string? identityProvider, string? userId, string? username, string? userRoles, string? userClaims);
+    Task<IEnumerable<MsClientPrincipalClaim>> GetDefaultUserClaims(string? identityProvider);
+
+    Task<bool> UserSignInAsync(ProtectedSessionStorage session, UserSignInContext signInContext);
 }
 
-public class EasyAuthService(UserIdGenerator userId) : IEasyAuthService
+public class EasyAuthService(IHttpContextAccessor accessor, IdGenerator generator) : IEasyAuthService
 {
+    private readonly HttpContext? _context = accessor.HttpContext;
+
     public JsonSerializerOptions JsonSerializerOptions { get; } = new() { WriteIndented = true };
 
-    public Guid UserId { get; } = userId.Value;
+    public Guid UserId { get; } = generator.UserId;
+
+    public Guid ClientId { get; } = generator.ClientId;
+
+    public Guid TenantId { get; } = generator.TenantId;
 
     public IEnumerable<string> UserRoles { get; } = [ "User", "Admin" ];
 
-    public async Task<IEnumerable<MsClientPrincipalClaim>> GetUserClaims(string? identityProvider)
+    public IdentityProviderType GetIdentityProvider(string? identityProvider)
     {
-        var claims = new List<MsClientPrincipalClaim>()
+        if (string.IsNullOrWhiteSpace(identityProvider) == true)
         {
-            new() { Type = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", Value = this.UserId.ToString() },
-            new() { Type = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", Value = "User" },
-            new() { Type = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", Value = "Admin" },
+            return IdentityProviderType.None;
+        }
+
+        if (identityProvider.Equals("aad", StringComparison.InvariantCultureIgnoreCase))
+        {
+            return IdentityProviderType.EntraID;
+        }
+
+        return Enum.TryParse<IdentityProviderType>(identityProvider, true, out var result) ? result : IdentityProviderType.None;
+    }
+
+    public async Task<IEnumerable<MsClientPrincipalClaim>> GetDefaultUserClaims(string? identityProvider)
+    {
+        List<MsClientPrincipalClaim>? claims;
+        var provider = this.GetIdentityProvider(identityProvider);
+        if (provider == IdentityProviderType.None)
+        {
+            claims = [];
+            return await Task.FromResult(claims).ConfigureAwait(false);
+        }
+
+        claims = provider switch
+        {
+            IdentityProviderType.EntraID =>
+            [
+                new() { Type = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/objectidentifier", Value = this.UserId.ToString() },
+                new() { Type = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", Value = "User" },
+                new() { Type = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role", Value = "Admin" },
+            ],
+            IdentityProviderType.GitHub => [],
+            _ => [],
         };
 
         return await Task.FromResult(claims).ConfigureAwait(false);
     }
 
-    public async Task<bool> UserSignInAsync(HttpContext? context, string? identityProvider, string? userId, string? username, string? userRoles, string? userClaims)
+    public async Task<bool> UserSignInAsync(ProtectedSessionStorage session, UserSignInContext signInContext)
     {
-        var provider = ParseIdentityProvider(identityProvider);
+        var provider = this.GetIdentityProvider(signInContext.IdentityProvider);
         if (provider == IdentityProviderType.None)
         {
             return await Task.FromResult(false).ConfigureAwait(false);
@@ -48,39 +90,42 @@ public class EasyAuthService(UserIdGenerator userId) : IEasyAuthService
 
         var clientPrincipal = provider switch
         {
-            IdentityProviderType.EntraID => this.BuildEntraIDMsClientPrincipal(identityProvider, userId, username, userRoles, userClaims),
-            IdentityProviderType.GitHub => this.BuildGitHubMsClientPrincipal(identityProvider, userId, username, userRoles, userClaims),
+            IdentityProviderType.EntraID => this.BuildEntraIDMsClientPrincipal(signInContext),
+            IdentityProviderType.GitHub => this.BuildGitHubMsClientPrincipal(signInContext),
             _ => null,
         };
 
-        context!.Response.Headers.Append("X-MS-CLIENT-PRINCIPAL-NAME", username!);
-        context!.Response.Headers.Append("X-MS-CLIENT-PRINCIPAL-ID", Guid.NewGuid().ToString());
-        context!.Response.Headers.Append("X-MS-CLIENT-PRINCIPAL-IDP", identityProvider!);
-
         var serialised = JsonSerializer.Serialize(clientPrincipal, JsonSerializerOptions);
         var encoded = Convert.ToBase64String(Encoding.UTF8.GetBytes(serialised));
-        context!.Response.Headers.Append("X-MS-CLIENT-PRINCIPAL", encoded);
+        var principal = new Dictionary<string, string>()
+        {
+            { "X-MS-CLIENT-PRINCIPAL-NAME", signInContext.Username! },
+            { "X-MS-CLIENT-PRINCIPAL-ID", signInContext.UserId!.ToString() },
+            { "X-MS-CLIENT-PRINCIPAL-IDP", signInContext.IdentityProvider! },
+            { "X-MS-CLIENT-PRINCIPAL", encoded },
+        };
+        await session.SetAsync("easyauth", principal).ConfigureAwait(false);
 
         return await Task.FromResult(true).ConfigureAwait(false);
     }
 
-    private MsClientPrincipal BuildEntraIDMsClientPrincipal(string? identityProvider, string? userId, string? username, string? userRoles, string? userClaims)
+    private MsClientPrincipal BuildEntraIDMsClientPrincipal(UserSignInContext context)
     {
         var utcNow = DateTimeOffset.UtcNow;
         var defaultClaims = new List<MsClientPrincipalClaim>()
         {
-            new() { Type = "aud", Value = userId },
-            new() { Type = "iss", Value = "https://login.microsoftonline.com/00000000-0000-0000-0000-000000000000/v2.0" },
+            new() { Type = "aud", Value = context.ClientId },
+            new() { Type = "iss", Value = $"https://login.microsoftonline.com/{context.TenantId}/v2.0" },
             new() { Type = "iat", Value = $"{utcNow.ToUnixTimeSeconds()}" },
             new() { Type = "nbf", Value = $"{utcNow.ToUnixTimeSeconds()}" },
             new() { Type = "nbf", Value = $"{utcNow.AddMinutes(90).ToUnixTimeSeconds()}" },
             new() { Type = "aio", Value = $"{Convert.ToBase64String(Guid.NewGuid().ToByteArray())}" },
-            new() { Type = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", Value = username },
-            new() { Type = "http://schemas.microsoft.com/identity/claims/identityprovider", Value = "https://sts.windows.net/00000000-0000-0000-0000-000000000000/" },
+            new() { Type = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", Value = context.Username },
+            new() { Type = "http://schemas.microsoft.com/identity/claims/identityprovider", Value = $"https://sts.windows.net/{context.TenantId}/" },
         };
 
-        var userRoleClaims = (userRoles?.Split('\n', StringSplitOptions.RemoveEmptyEntries) ?? []).Select(p => new MsClientPrincipalClaim() { Type = "roles", Value = p });
-        var userClaimClaims = JsonSerializer.Deserialize<IEnumerable<MsClientPrincipalClaim>>(userClaims ?? "[]", JsonSerializerOptions) ?? [];
+        var userRoleClaims = (context.UserRoles?.Split('\n', StringSplitOptions.RemoveEmptyEntries) ?? []).Select(p => new MsClientPrincipalClaim() { Type = "roles", Value = p });
+        var userClaimClaims = JsonSerializer.Deserialize<IEnumerable<MsClientPrincipalClaim>>(context.UserClaims ?? "[]", JsonSerializerOptions) ?? [];
 
         var claims = new List<MsClientPrincipalClaim>();
         claims.AddRange(defaultClaims);
@@ -95,7 +140,7 @@ public class EasyAuthService(UserIdGenerator userId) : IEasyAuthService
         }
         var principal = new MsClientPrincipal()
         {
-            IdentityProvider = identityProvider,
+            IdentityProvider = context.IdentityProvider,
             NameClaimType = "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
             RoleClaimType = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
             Claims = claims,
@@ -104,23 +149,8 @@ public class EasyAuthService(UserIdGenerator userId) : IEasyAuthService
         return principal;
     }
 
-    private MsClientPrincipal BuildGitHubMsClientPrincipal(string? identityProvider, string? userId, string? username, string? userRoles, string? userClaims)
+    private MsClientPrincipal BuildGitHubMsClientPrincipal(UserSignInContext context)
     {
         throw new NotImplementedException();
-    }
-
-    private static IdentityProviderType ParseIdentityProvider(string? identityProvider)
-    {
-        if (string.IsNullOrWhiteSpace(identityProvider) == true)
-        {
-            return IdentityProviderType.None;
-        }
-
-        if (identityProvider.Equals("aad", StringComparison.InvariantCultureIgnoreCase))
-        {
-            return IdentityProviderType.EntraID;
-        }
-
-        return Enum.TryParse<IdentityProviderType>(identityProvider, true, out var result) ? result : IdentityProviderType.None;
     }
 }

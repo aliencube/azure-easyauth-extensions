@@ -1,6 +1,8 @@
 ﻿@page "/.auth/login/{identityProvider}"
 @inject IEasyAuthService EasyAuthService
+@inject IHttpContextAccessor HttpContextAccessor
 @inject NavigationManager NavigationManager
+@inject ProtectedSessionStorage ProtectedSessionStorage
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="container mt-5">
@@ -12,24 +14,43 @@
             <div class="row mb-3">
                 <label class="form-label col-2 text-end" for="authentication-type">Provider</label>
                 <div class="col-10">
-                    <input type="text" class="form-control" id="authentication-type" placeholder="Choose an auth provider" value="@IdentityProvider" disabled>
+                    <input type="text" class="form-control" id="authentication-type" placeholder="Choose an auth provider" value="@IdentityProvider" disabled required>
                     <small class="form-text text-muted">Name of the identity provider</small>
+                </div>
+            </div>
+
+            @if (this.IdentityProviderType == IdentityProviderType.EntraID)
+            {
+                <div class="row mb-3">
+                    <label class="form-label col-2 text-end" for="tenant-id">Tenant ID</label>
+                    <div class="col-10">
+                        <input type="text" class="form-control" id="tenant-id" placeholder="Enter a tenant ID" @bind="@TenantId" required>
+                        <small class="form-text text-muted">A tenant ID</small>
+                    </div>
+                </div>
+            }
+
+            <div class="row mb-3">
+                <label class="form-label col-2 text-end" for="client-id">Client ID</label>
+                <div class="col-10">
+                    <input type="text" class="form-control" id="client-id" placeholder="Enter a client ID" @bind="@ClientId" required>
+                    <small class="form-text text-muted">A client ID</small>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="form-label col-2 text-end" for="user-id">User ID</label>
                 <div class="col-10">
-                    <input type="text" class="form-control" id="user-id" placeholder="Choose a user ID" @bind="@UserId">
-                    <small class="form-text text-muted">An Azure EasyAuth-specific unique ID for the user</small>
+                    <input type="text" class="form-control" id="user-id" placeholder="Choose a user ID" @bind="@UserId" required>
+                    <small class="form-text text-muted">A user ID</small>
                 </div>
             </div>
 
             <div class="row mb-3">
                 <label class="form-label col-2 text-end" for="username">Username</label>
                 <div class="col-10">
-                    <input type="text" class="form-control" id="username" placeholder="Choose a username" @bind="@Username">
-                    <small class="form-text text-muted">Username or email address of the user</small>
+                    <input type="text" class="form-control" id="username" placeholder="Choose a username" @bind="@Username" required>
+                    <small class="form-text text-muted">Username or email address</small>
                 </div>
             </div>
 
@@ -45,7 +66,7 @@
             <div class="row mb-3">
                 <label class="form-label col-2 text-end" for="user-claims">User's claims</label>
                 <div class="col-10">
-                    <textarea class="form-control" id="user-claims" rows="10" placeholder="[{'typ': 'name','val': 'Azure EasyAuth'}]" @bind="@UserClaims"></textarea>
+                    <textarea class="form-control" id="user-claims" rows="6" placeholder="[{'typ': 'name','val': 'Azure EasyAuth'}]" @bind="@UserClaims"></textarea>
                     <small class="form-text text-muted">Claims from the identity provider. JSON array of claims.</small>
                 </div>
             </div>
@@ -64,6 +85,9 @@
 <Footer />
 
 @code {
+    private IdentityProviderType IdentityProviderType { get; set; }
+    private string? TenantId { get; set; }
+    private string? ClientId { get; set; }
     private string? UserId { get; set; }
     private string? Username { get; set; }
     private string? UserRoles { get; set; }
@@ -72,29 +96,38 @@
     [Parameter]
     public string? IdentityProvider { get; set; }
 
-    [CascadingParameter]
-    private HttpContext? HttpContext { get; set; }
-
     protected override async Task OnInitializedAsync()
     {
-        this.UserId = this.EasyAuthService.UserId.ToString("N");
+        this.IdentityProviderType = this.EasyAuthService.GetIdentityProvider(this.IdentityProvider);
+        this.TenantId = this.EasyAuthService.TenantId.ToString();
+        this.ClientId = this.EasyAuthService.ClientId.ToString();
+        this.UserId = this.EasyAuthService.UserId.ToString();
         this.Username = string.Empty;
         this.UserRoles = this.ParseUserRoles(this.EasyAuthService.UserRoles);
-        this.UserClaims = this.ParseUserClaims(await this.EasyAuthService.GetUserClaims(this.IdentityProvider));
+        this.UserClaims = this.ParseUserClaims(await this.EasyAuthService.GetDefaultUserClaims(this.IdentityProvider));
 
         await Task.CompletedTask;
     }
 
     protected async Task LoginAsync()
     {
-        var signedIn = await this.EasyAuthService.UserSignInAsync(this.HttpContext, this.IdentityProvider, this.UserId, this.Username, this.UserRoles, this.UserClaims);
+        var signedIn = false;
+        try
+        {
+            var signInContext = new UserSignInContext(this.IdentityProvider, this.TenantId, this.ClientId, this.UserId, this.Username, this.UserRoles, this.UserClaims);
+            signedIn = await this.EasyAuthService.UserSignInAsync(this.ProtectedSessionStorage, signInContext);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+
+            return;
+        }
 
         if (signedIn)
         {
             this.NavigationManager.NavigateTo("/.auth/login/done");
         }
-
-        await Task.CompletedTask;
     }
 
     protected async Task ClearAsync()
@@ -102,7 +135,7 @@
         this.UserId = this.EasyAuthService.UserId.ToString("N");
         this.Username = string.Empty;
         this.UserRoles = this.ParseUserRoles(this.EasyAuthService.UserRoles);
-        this.UserClaims = this.ParseUserClaims(await this.EasyAuthService.GetUserClaims(this.IdentityProvider));
+        this.UserClaims = this.ParseUserClaims(await this.EasyAuthService.GetDefaultUserClaims(this.IdentityProvider));
 
         await Task.CompletedTask;
     }

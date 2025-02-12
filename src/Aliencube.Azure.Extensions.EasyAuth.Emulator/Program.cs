@@ -7,7 +7,16 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
 
-builder.Services.AddSingleton<UserIdGenerator>();
+// builder.Services.AddDistributedMemoryCache();
+// builder.Services.AddSession(options =>
+// {
+//     options.IdleTimeout = TimeSpan.FromMinutes(30);
+//     options.Cookie.HttpOnly = true;
+//     options.Cookie.IsEssential = true;
+// });
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSingleton<IdGenerator>();
 builder.Services.AddScoped<IEasyAuthService, EasyAuthService>();
 
 var app = builder.Build();
@@ -25,6 +34,9 @@ app.UseHttpsRedirection();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
+
+// app.UseSession();
+
 app.MapRazorComponents<App>()
    .AddInteractiveServerRenderMode();
 
