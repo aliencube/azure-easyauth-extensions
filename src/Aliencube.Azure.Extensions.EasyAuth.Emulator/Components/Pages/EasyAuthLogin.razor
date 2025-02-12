@@ -1,0 +1,113 @@
+﻿@page "/.auth/login/{authenticationType}"
+@inject IEasyAuthService EasyAuthService
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3>Azure EasyAuth Emulator</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <label class="form-label col-2 text-end" for="authentication-type">Provider</label>
+                <div class="col-10">
+                    <input type="text" class="form-control" id="authentication-type" placeholder="Choose an auth provider" value="@AuthenticationType" disabled>
+                    <small class="form-text text-muted">Name of the identity provider</small>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="form-label col-2 text-end" for="user-id">User ID</label>
+                <div class="col-10">
+                    <input type="text" class="form-control" id="user-id" placeholder="Choose a user ID" @bind="@UserId">
+                    <small class="form-text text-muted">An Azure EasyAuth-specific unique ID for the user</small>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="form-label col-2 text-end" for="username">Username</label>
+                <div class="col-10">
+                    <input type="text" class="form-control" id="username" placeholder="Choose a username" @bind="@Username">
+                    <small class="form-text text-muted">Username or email address of the user</small>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="form-label col-2 text-end" for="user-roles">User's roles</label>
+                <div class="col-10">
+                    <textarea class="form-control" id="user-roles" rows="3" @bind="@UserRoles"></textarea>
+                    <small class="form-text text-muted">Roles used during authorization. One role per line.</small>
+                    <small class="form-text text-muted">Note: roles "User" and "Admin" will be added automatically if not provided.</small>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <label class="form-label col-2 text-end" for="user-claims">User's claims</label>
+                <div class="col-10">
+                    <textarea class="form-control" id="user-claims" rows="10" placeholder="[{'typ': 'name','val': 'Azure EasyAuth'}]" @bind="@UserClaims"></textarea>
+                    <small class="form-text text-muted">Claims from the identity provider. JSON array of claims.</small>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-2"></div>
+                <div class="col-10 d-flex justify-content-start">
+                    <button class="btn btn-primary me-2" @onclick="LoginAsync">Login</button>
+                    <button class="btn btn-danger" @onclick="ClearAsync">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<Footer />
+
+@code {
+    private string? UserId { get; set; }
+    private string? Username { get; set; }
+    private string? UserRoles { get; set; }
+    private string? UserClaims { get; set; }
+
+    [Parameter]
+    public string? AuthenticationType { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.UserId = this.EasyAuthService.UserId.ToString("N");
+        this.Username = string.Empty;
+        this.UserRoles = this.ParseUserRoles(this.EasyAuthService.UserRoles);
+        this.UserClaims = this.ParseUserClaims(await this.EasyAuthService.GetUserClaims(this.AuthenticationType));
+
+        await Task.CompletedTask;
+    }
+
+    protected async Task LoginAsync()
+    {
+        this.NavigationManager.NavigateTo("/.auth/login/done");
+    }
+
+    protected async Task ClearAsync()
+    {
+        this.UserId = this.EasyAuthService.UserId.ToString("N");
+        this.Username = string.Empty;
+        this.UserRoles = this.ParseUserRoles(this.EasyAuthService.UserRoles);
+        this.UserClaims = this.ParseUserClaims(await this.EasyAuthService.GetUserClaims(this.AuthenticationType));
+
+        await Task.CompletedTask;
+    }
+
+    private string ParseUserRoles(IEnumerable<string> userRoles)
+    {
+        var parsed = userRoles.Aggregate(string.Empty, (acc, role) => $"{acc}\n{role}");
+
+        return parsed.Trim();
+    }
+
+    private string ParseUserClaims(IEnumerable<MsClientPrincipalClaim> userClaims)
+    {
+        var serialised = JsonSerializer.Serialize(userClaims, this.EasyAuthService.JsonSerializerOptions);
+
+        return serialised ?? "[]";
+    }
+}

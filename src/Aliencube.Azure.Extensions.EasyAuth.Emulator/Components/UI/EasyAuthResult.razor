@@ -1,0 +1,31 @@
+﻿<div class="container mt-5">
+    <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+            <h3>@header</h3>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <p class="d-flex align-items-center"><span class="bi bi-arrow-right-square-fill"></span> <a href="/">Return to the website</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? header;
+
+    [Parameter]
+    public EasyAuthResultType ResultType { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        this.header = this.ResultType switch
+        {
+            EasyAuthResultType.SignIn => "You have successfully signed in",
+            EasyAuthResultType.SignOut => "You have been signed out",
+            _ => "Unknown result",
+        };
+
+        await Task.CompletedTask;
+    }
+}
