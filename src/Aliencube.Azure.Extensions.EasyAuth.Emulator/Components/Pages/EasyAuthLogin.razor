@@ -1,4 +1,4 @@
-﻿@page "/.auth/login/{authenticationType}"
+﻿@page "/.auth/login/{identityProvider}"
 @inject IEasyAuthService EasyAuthService
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
@@ -12,7 +12,7 @@
             <div class="row mb-3">
                 <label class="form-label col-2 text-end" for="authentication-type">Provider</label>
                 <div class="col-10">
-                    <input type="text" class="form-control" id="authentication-type" placeholder="Choose an auth provider" value="@AuthenticationType" disabled>
+                    <input type="text" class="form-control" id="authentication-type" placeholder="Choose an auth provider" value="@IdentityProvider" disabled>
                     <small class="form-text text-muted">Name of the identity provider</small>
                 </div>
             </div>
@@ -70,21 +70,31 @@
     private string? UserClaims { get; set; }
 
     [Parameter]
-    public string? AuthenticationType { get; set; }
+    public string? IdentityProvider { get; set; }
+
+    [CascadingParameter]
+    private HttpContext? HttpContext { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         this.UserId = this.EasyAuthService.UserId.ToString("N");
         this.Username = string.Empty;
         this.UserRoles = this.ParseUserRoles(this.EasyAuthService.UserRoles);
-        this.UserClaims = this.ParseUserClaims(await this.EasyAuthService.GetUserClaims(this.AuthenticationType));
+        this.UserClaims = this.ParseUserClaims(await this.EasyAuthService.GetUserClaims(this.IdentityProvider));
 
         await Task.CompletedTask;
     }
 
     protected async Task LoginAsync()
     {
-        this.NavigationManager.NavigateTo("/.auth/login/done");
+        var signedIn = await this.EasyAuthService.UserSignInAsync(this.HttpContext, this.IdentityProvider, this.UserId, this.Username, this.UserRoles, this.UserClaims);
+
+        if (signedIn)
+        {
+            this.NavigationManager.NavigateTo("/.auth/login/done");
+        }
+
+        await Task.CompletedTask;
     }
 
     protected async Task ClearAsync()
@@ -92,7 +102,7 @@
         this.UserId = this.EasyAuthService.UserId.ToString("N");
         this.Username = string.Empty;
         this.UserRoles = this.ParseUserRoles(this.EasyAuthService.UserRoles);
-        this.UserClaims = this.ParseUserClaims(await this.EasyAuthService.GetUserClaims(this.AuthenticationType));
+        this.UserClaims = this.ParseUserClaims(await this.EasyAuthService.GetUserClaims(this.IdentityProvider));
 
         await Task.CompletedTask;
     }
